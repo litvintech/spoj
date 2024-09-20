@@ -3,90 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web3 Profile</title>
+    <title>Web3 Profile App</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
     <style>
         body { 
-            background-color: #2b2b2b; /* Light black background */
+            background-color: #2b2b2b; 
             font-family: Arial, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            flex-direction: column; 
-            height: 100vh; 
+            color: #e0c7ff; 
             margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
-            color: #e0c7ff; /* Light purple text */
         }
-        .container {
-            background: #383838; /* Slightly lighter black */
-            border-radius: 10px; 
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-            padding: 30px;
-            width: 400px;
-            animation: slideIn 1s ease-out;
-        }
-        .logo {
+        nav {
             position: absolute;
             top: 20px;
             left: 20px;
-            width: 120px;
-            height: 120px;
-            animation: bounceIn 1.5s ease-in-out;
         }
-        h1 {
-            color: #e0c7ff; /* Light purple text */
+        nav a {
+            color: #e0c7ff;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
         }
-        label {
-            color: #e0c7ff; /* Light purple label text */
+        nav a:hover {
+            color: #a389d4;
         }
-        .btn-primary {
-            background-color: #7d5fb2; /* Light purple button */
+        .container {
+            background: #383838;
+            border-radius: 10px; 
+            padding: 30px;
+            width: 400px;
+            display: none;
+            animation: fadeIn 0.7s ease-out;
+        }
+        .active {
+            display: block;
+        }
+        .btn-primary, .btn-success {
+            background-color: #7d5fb2;
             border: none;
             transition: background-color 0.3s ease;
         }
-        .btn-primary:hover {
-            background-color: #a389d4; /* Slightly brighter purple on hover */
+        .btn-primary:hover, .btn-success:hover {
+            background-color: #a389d4;
         }
-        .btn-success {
-            background-color: #5fb27d; /* Green success button */
-            border: none;
-            transition: background-color 0.3s ease;
+        .nodes-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #2b2b2b;
+            overflow: hidden;
+            z-index: -1;
         }
-        .btn-success:hover {
-            background-color: #82d4a3; /* Brighter green on hover */
+        canvas {
+            display: block;
         }
-        @keyframes slideIn {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        @keyframes bounceIn {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-20px);
-            }
-            60% {
-                transform: translateY(-10px);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <img src="https://bafkreics7pg4aswbviqxbdrcnu5rpyp3xf2sshhpspdeiyi2pg3kmy4tzm.ipfs.flk-ipfs.xyz" alt="Logo" class="logo animate__animated animate__fadeIn">
-    <div class="container animate__animated animate__fadeInUp">
+    <!-- Navigation Links -->
+    <nav>
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="showPage('profile')">Profile</a>
+    </nav>
+
+    <!-- Logo -->
+    <img src="https://bafkreics7pg4aswbviqxbdrcnu5rpyp3xf2sshhpspdeiyi2pg3kmy4tzm.ipfs.flk-ipfs.xyz" alt="Logo" style="position: absolute; top: 10px; right: 10px; width: 60px; height: 60px;">
+
+    <!-- Home Page -->
+    <div id="home" class="container active animate__animated animate__fadeIn">
         <h1 class="text-center">Web3 Profile Management</h1>
         <button id="connectButton" class="btn btn-primary btn-block">Connect Wallet</button>
-        <div id="profile" class="mt-3" style="display: none;">
+        <div id="profileForm" class="mt-3" style="display: none;">
             <h2>Your Profile</h2>
             <div class="form-group">
                 <label for="name">Name:</label>
@@ -100,16 +101,34 @@
         </div>
     </div>
 
+    <!-- About Page -->
+    <div id="about" class="container">
+        <h1 class="text-center">About Web3 App</h1>
+        <p>This app demonstrates a simple Web3 profile management interface using a connected Ethereum wallet. You can store your profile locally and interact with your blockchain wallet.</p>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="profile" class="container">
+        <h1 class="text-center">Your Profile</h1>
+        <div id="profileInfo" style="color: #e0c7ff;"></div>
+    </div>
+
+    <!-- Networking Nodes Animation (About Page) -->
+    <div class="nodes-bg" id="networking-nodes">
+        <canvas id="networkCanvas"></canvas>
+    </div>
+
     <script>
         let web3;
         let userAddress;
 
+        // Connect Wallet
         document.getElementById('connectButton').onclick = async () => {
             if (typeof window.ethereum !== 'undefined') {
                 web3 = new Web3(window.ethereum);
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
                 userAddress = (await web3.eth.getAccounts())[0];
-                document.getElementById('profile').style.display = 'block';
+                document.getElementById('profileForm').style.display = 'block';
                 document.getElementById('connectButton').innerText = `Connected: ${userAddress}`;
                 loadProfile();
             } else {
@@ -117,23 +136,89 @@
             }
         };
 
+        // Save Profile
         document.getElementById('saveButton').onclick = () => {
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
-
             const profile = { address: userAddress, name, email };
             localStorage.setItem(userAddress, JSON.stringify(profile));
             alert('Profile saved!');
         };
 
+        // Load Profile
         function loadProfile() {
             const profile = localStorage.getItem(userAddress);
             if (profile) {
                 const { name, email } = JSON.parse(profile);
                 document.getElementById('name').value = name || '';
                 document.getElementById('email').value = email || '';
+                document.getElementById('profileInfo').innerHTML = `<p><strong>Address:</strong> ${userAddress}</p><p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p>`;
             }
         }
-    </script>
-</body>
-</html>
+
+        // Show different pages
+        function showPage(page) {
+            document.querySelectorAll('.container').forEach(container => container.classList.remove('active'));
+            document.getElementById(page).classList.add('active');
+        }
+
+        // Networking nodes animation
+        const canvas = document.getElementById("networkCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        let particles = [];
+        let numParticles = 100;
+
+        function createParticle() {
+            return {
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2,
+                radius: 2
+            };
+        }
+
+        for (let i = 0; i < numParticles; i++) {
+            particles.push(createParticle());
+        }
+
+        function updateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = "#e0c7ff";
+                ctx.fill();
+            });
+            connectParticles();
+        }
+
+        function connectParticles() {
+            for (let i = 0; i < numParticles; i++) {
+                for (let j = i + 1; j < numParticles; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = "#e0c7ff";
+                        ctx.lineWidth = 0.2;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            updateParticles();
+            requestAnimationFrame(animate);
