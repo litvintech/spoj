@@ -9,33 +9,81 @@
     <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
     <style>
         body { 
-            background-color: #f8f9fa; 
+            background-color: #2b2b2b; /* Light black background */
             font-family: Arial, sans-serif; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             flex-direction: column; 
             height: 100vh; 
+            margin: 0;
+            overflow: hidden;
+            color: #e0c7ff; /* Light purple text */
         }
         .container {
-            background: white; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            background: #383838; /* Slightly lighter black */
+            border-radius: 10px; 
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            padding: 30px;
             width: 400px;
+            animation: slideIn 1s ease-out;
         }
         .logo {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 50px;
-            height: 50px;
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            animation: bounceIn 1.5s ease-in-out;
+        }
+        h1 {
+            color: #e0c7ff; /* Light purple text */
+        }
+        label {
+            color: #e0c7ff; /* Light purple label text */
+        }
+        .btn-primary {
+            background-color: #7d5fb2; /* Light purple button */
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #a389d4; /* Slightly brighter purple on hover */
+        }
+        .btn-success {
+            background-color: #5fb27d; /* Green success button */
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-success:hover {
+            background-color: #82d4a3; /* Brighter green on hover */
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes bounceIn {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
         }
     </style>
 </head>
 <body>
-    <img src="https://bafkreifhj4ztxa2fps3jqnur6mbmdjd3wzr2lwui4pku4rjqemg3znfn3i.ipfs.flk-ipfs.xyz" alt="Logo" class="logo">
-    <div class="container animate__animated animate__fadeIn">
+    <img src="https://bafkreieuokl7bmgd6c64ly5h6lt6vawyxe42w7byj5y7jmh3sjs2auk3tu.ipfs.flk-ipfs.xyz" alt="Logo" class="logo animate__animated animate__fadeIn">
+    <div class="container animate__animated animate__fadeInUp">
         <h1 class="text-center">Web3 Profile Management</h1>
         <button id="connectButton" class="btn btn-primary btn-block">Connect Wallet</button>
         <div id="profile" class="mt-3" style="display: none;">
