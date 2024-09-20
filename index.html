@@ -1,1 +1,66 @@
-<h1>testing</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3 Wallet Connect</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Web3 Wallet Connect</h1>
+        <nav>
+            <ul>
+                <li><a href="#about">About</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="about">
+        <h2>About Us</h2>
+        <p>We are building a decentralized application (dApp) that leverages blockchain technology to empower users.</p>
+    </section>
+
+    <section id="features">
+        <h2>Features</h2>
+        <ul>
+            <li>Secure transactions</li>
+            <li>Decentralized data storage</li>
+            <li>User privacy protection</li>
+        </ul>
+    </section>
+
+    <section id="wallet">
+        <h2>Connect Your Wallet</h2>
+        <button id="connect-button">Connect Wallet</button>
+        <p id="wallet-address"></p>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 My Web3 Project. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Check if MetaMask is installed
+        if (typeof window.ethereum === 'undefined') {
+            document.getElementById('wallet-address').textContent = 'Please install MetaMask!';
+        } else {
+            const connectButton = document.getElementById('connect-button');
+            const walletAddress = document.getElementById('wallet-address');
+
+            connectButton.addEventListener('click', async () => {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    walletAddress.textContent = `Connected: ${accounts[0]}`;
+                } catch (error) {
+                    console.error("Error connecting to wallet:", error);
+                    walletAddress.textContent = 'Connection failed. Please try again.';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
