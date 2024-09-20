@@ -81,7 +81,7 @@
     </nav>
 
     <!-- Logo -->
-    <img src="https://bafkreics7pg4aswbviqxbdrcnu5rpyp3xf2sshhpspdeiyi2pg3kmy4tzm.ipfs.flk-ipfs.xyz" alt="Logo" style="position: absolute; top: 10px; right: 10px; width: 60px; height: 60px;">
+    <img src="https://bafkreifhj4ztxa2fps3jqnur6mbmdjd3wzr2lwui4pku4rjqemg3znfn3i.ipfs.flk-ipfs.xyz" alt="Logo" style="position: absolute; top: 10px; right: 10px; width: 60px; height: 60px;">
 
     <!-- Home Page -->
     <div id="home" class="container active animate__animated animate__fadeIn">
@@ -124,35 +124,58 @@
 
         // Connect Wallet
         document.getElementById('connectButton').onclick = async () => {
+            // Check if the Ethereum provider (MetaMask) is available
             if (typeof window.ethereum !== 'undefined') {
-                web3 = new Web3(window.ethereum);
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                userAddress = (await web3.eth.getAccounts())[0];
-                document.getElementById('profileForm').style.display = 'block';
-                document.getElementById('connectButton').innerText = `Connected: ${userAddress}`;
-                loadProfile();
+                try {
+                    // Initialize a Web3 instance using the provided provider (MetaMask)
+                    web3 = new Web3(window.ethereum);
+
+                    // Request access to the user's accounts
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                    // Get the first account (default account)
+                    userAddress = accounts[0];
+
+                    // Display the connected wallet address
+                    document.getElementById('connectButton').innerText = `Connected: ${userAddress}`;
+
+                    // Display the profile form after connection
+                    document.getElementById('profileForm').style.display = 'block';
+
+                    // Load existing profile if it exists in localStorage
+                    loadProfile();
+                } catch (error) {
+                    console.error("User denied account access or other error:", error);
+                    alert("Failed to connect to wallet. Please try again.");
+                }
             } else {
-                alert('Please install MetaMask!');
+                alert('No Ethereum provider detected. Please install MetaMask!');
             }
         };
 
-        // Save Profile
+        // Save profile to localStorage
         document.getElementById('saveButton').onclick = () => {
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
+
+            // Store profile in localStorage
             const profile = { address: userAddress, name, email };
             localStorage.setItem(userAddress, JSON.stringify(profile));
+
             alert('Profile saved!');
         };
 
-        // Load Profile
+        // Load profile from localStorage
         function loadProfile() {
             const profile = localStorage.getItem(userAddress);
             if (profile) {
                 const { name, email } = JSON.parse(profile);
                 document.getElementById('name').value = name || '';
                 document.getElementById('email').value = email || '';
-                document.getElementById('profileInfo').innerHTML = `<p><strong>Address:</strong> ${userAddress}</p><p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p>`;
+                document.getElementById('profileInfo').innerHTML = `
+                    <p><strong>Address:</strong> ${userAddress}</p>
+                    <p><strong>Name:</strong> ${name || 'N/A'}</p>
+                    <p><strong>Email:</strong> ${email || 'N/A'}</p>`;
             }
         }
 
@@ -211,14 +234,25 @@
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = "#e0c7ff";
-                        ctx.lineWidth = 0.2;
+                        ctx.strokeStyle = "#7d5fb2";
+                        ctx.lineWidth = 0.5;
                         ctx.stroke();
                     }
                 }
             }
         }
 
-        function animate() {
+        function loop() {
             updateParticles();
-            requestAnimationFrame(animate);
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+
+        window.onresize = function () {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        };
+    </script>
+</body>
+</html>
